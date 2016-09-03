@@ -5,7 +5,6 @@
 
 var express = require('express')
   , routes = require('./routes')
-  , user = require('./routes/user')
   , http = require('http')
   , path = require('path')
   , favicon = require('serve-favicon')
@@ -15,6 +14,11 @@ var express = require('express')
   , session = require('express-session')
   , logger = require('morgan')
   , multer  = require('multer');
+
+//require the handlers below.
+var register = require('./routes/register');
+
+
 
 var app = express();
 
@@ -37,7 +41,9 @@ if ('development' === app.get('env')) {
 }
 
 app.get('/', routes.index);
-app.get('/users', user.list);
+
+//use handlers
+app.use('/register',register);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
