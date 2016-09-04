@@ -26,15 +26,26 @@ router.get('/checkName/:name', function(req, res,next) {
 });
 
 //check email
-router.get('/checkEmail/:email', function(req, res,next) {
+router.get('/checkEmail/:flag/:email', function(req, res,next) {
 	 var email = req.params.email;
+	 var flag = req.params.flag;
 	 User.findOne({email:email},function(err,user){  
 	     if(!err){
 	    	 if(user){
-	    		 res.json({"error" : "邮箱已存在"});
+	    		 if(flag.toLowerCase() === 'y'){
+	    			 res.json({"error" : "邮箱已存在"});
+	    		 }
+	    		 else{
+	    			 res.json({"success" : "邮箱存在"});
+	    		 }
 	    	 }
 	    	 else{
-	    		 res.json({"success" : "邮箱可以使用"});
+	    		 if(flag.toLowerCase() === 'y'){
+	    			 res.json({"success" : "邮箱可以使用"});
+	    		 }
+	    		 else{
+	    			 res.json({"error" : "邮箱不存在"});
+	    		 }
 	    	 }
 	     }
 	     else{
@@ -60,6 +71,13 @@ router.post('/createUser',function(req, res,next){
 			res.json({"success" : "注册成功"});
 		}
 	});
+});
+
+
+//reset pwd 
+router.post('/resetPwdConfirm',function(req, res,next){
+	var email = req.body.email;
+	res.json({"success" : "重置密码邮件已发送至 " + email + "，请确认"});
 });
 
 
