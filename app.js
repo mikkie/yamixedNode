@@ -17,6 +17,7 @@ var express = require('express')
 
 //require the handlers below.
 var register = require('./routes/register');
+var login = require('./routes/login');
 
 
 
@@ -44,6 +45,7 @@ app.get('/', routes.index);
 
 //use handlers
 app.use('/register',register);
+app.use('/login',login);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
