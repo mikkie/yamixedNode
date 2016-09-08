@@ -5,7 +5,8 @@ var express = require('express'),
         router = express.Router(),
         crypto = require('crypto'),
         mongoose = require('../common/mongodbUtil'),
-        User = mongoose.model('User');
+        User = mongoose.model('User'),
+		common = require('../common/common');
 
 //check name
 router.get('/checkName/:name', function(req, res,next) {
@@ -77,6 +78,8 @@ router.post('/createUser',function(req, res,next){
 //reset pwd 
 router.post('/resetPwdConfirm',function(req, res,next){
 	var email = req.body.email;
+	var newPwd = common.generateRandomNum(6);
+	//TODO  send a email with new password
 	res.json({"success" : "重置密码邮件已发送至 " + email + "，请确认"});
 });
 

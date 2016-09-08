@@ -13,8 +13,9 @@ var express = require('express')
   , errorhandler = require('errorhandler')
   , session = require('express-session')
   , logger = require('morgan')
-  , multer  = require('multer');
-
+  , multer  = require('multer')
+  , cookieParser = require('cookie-parser');
+ 
 //require the handlers below.
 var register = require('./routes/register');
 var login = require('./routes/login');
@@ -34,6 +35,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(multer());
 app.use(methodOverride());
+app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 // development only

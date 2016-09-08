@@ -10,7 +10,8 @@ var UserSchema = new Schema({
 	   username  :  {type : String, index : true},
 	   email : {type : String, index : true},
 	   password : String,
-	   joinDate : { type: Date, default: Date.now }
+	   joinDate : { type: Date, default: Date.now },
+	   loginDate : { type: Date, default: Date.now }
 });  
 
 
