@@ -45,7 +45,7 @@ router.post('/go',function(req, res,next){
 	var emailORname = req.body.emailORname;
 	var password = req.body.password;
 	password = crypto.createHash('md5').update(password).digest("hex");
-	User.findOne({$or:[{email : emailORname},{username : emailORname}]},function(err,user){
+	User.findOne({$or:[{email : emailORname},{userName : emailORname}]},function(err,user){
 		if(!err){
 			if(user){
 				var userO = user.toObject();
