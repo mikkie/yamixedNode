@@ -20,6 +20,7 @@ var express = require('express')
 var register = require('./routes/register');
 var login = require('./routes/login');
 var space = require('./routes/space');
+var link = require('./routes/link');
 
 
 
@@ -50,6 +51,7 @@ app.get('/', routes.index);
 app.use('/register',register);
 app.use('/login',login);
 app.use('/space',space);
+app.use('/link',link);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
