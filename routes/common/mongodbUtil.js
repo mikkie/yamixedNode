@@ -28,6 +28,7 @@ var SpaceSchema = new Schema({
 
 //3.link
 var LinkSchema = new Schema({
+    url : {type : String, index : true},
     title : {type : String, index : true},
     description : {type : String, index : true},
     previewImg : String,
