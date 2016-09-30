@@ -56,5 +56,17 @@ router.post('/searchLinks', function (req, res) {
     });
 });
 
+router.post('/updateLinkVisitTime', function (req, res) {
+    Link.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.linkId)}, {$set:{lastVisitTime:new Date()}},function(err, doc){
+        if (err) {
+            res.json({"error": "更新lastVisitTime失败"});
+        }
+        else {
+            res.json({"success": doc});
+        }
+    });
+});
+
+
 
 module.exports = router;
