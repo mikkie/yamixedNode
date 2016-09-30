@@ -39,8 +39,10 @@ router.post('/getLinksBySpace', function (req, res) {
 router.post('/searchLinks', function (req, res) {
     var condition = {
         spaceId: mongoose.Types.ObjectId(req.body.spaceId),
-        $or: [{title: new RegExp(req.body.keyword, "i")}, {description: new RegExp(req.body.keyword, "i")}]
     };
+    if(req.body.keyword){
+        condition.$or = [{title: new RegExp(req.body.keyword, "i")}, {description: new RegExp(req.body.keyword, "i")}];
+    }
     if (req.body.tag) {
         condition.tags = req.body.tag
     }
