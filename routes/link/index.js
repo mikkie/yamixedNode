@@ -12,7 +12,8 @@ router.post('/postNewLink', function (req, res) {
         Link.findByIdAndUpdate(mongoose.Types.ObjectId(id),
             { $set: { title : req.body.title, description : req.body.description,
                 previewImg : req.body.previewImg,tags : req.body.tags,
-                spaceId : mongoose.Types.ObjectId(req.body.spaceId)}}, { new: true }, function (err, doc) {
+                spaceId : mongoose.Types.ObjectId(req.body.spaceId),
+                lastVisitTime:new Date()}}, { new: true }, function (err, doc) {
                 if (err) {
                     res.json({"error": "更新链接失败" + id});
                 }
