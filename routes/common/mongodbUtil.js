@@ -38,9 +38,21 @@ var LinkSchema = new Schema({
     lastVisitTime :{ type: Date, default: Date.now }
 });
 
+//4.group
+var GroupSchema = new Schema({
+    name : {type : String, index : true},
+    users : [{
+        userName : String,
+        userId : ObjectId
+    }],
+    owner : ObjectId,
+    createDate : { type: Date, default: Date.now }
+});
+
 
 mongoose.model('User',UserSchema);
 mongoose.model('Space',SpaceSchema);
 mongoose.model('Link', LinkSchema);
+mongoose.model('Group', GroupSchema);
 
 module.exports = mongoose;

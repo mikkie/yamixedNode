@@ -50,5 +50,17 @@ router.post('/postUpdateUser', function (req, res) {
    }
 });
 
+router.get('/getUsersByNameOrEmail', function (req, res) {
+    User.find({$or : [{userName :  new RegExp(req.query.keyword, "i")},{email : new RegExp(req.query.keyword, "i")}]},function(err,docs){
+        if(err){
+            res.json({"error" : err});
+        }
+        else{
+            res.json({"success": docs});
+        }
+    });
+});
+
+
 
 module.exports = router;
