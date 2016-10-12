@@ -34,4 +34,42 @@ router.post('/getUserSpace',function(req, res){
   });
 });
 
+
+router.get('/findSpaceByName', function (req, res) {
+    Space.findOne({spaceName : req.query.name},function(err,doc){
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": doc});
+        }
+    });
+});
+
+router.post('/new', function (req, res) {
+    var name = req.body.name;
+    var groups = req.body.groups;
+    var owner = req.body.owner;
+    var space = new Space();
+    space.spaceName = name;
+    var groupArray = [];
+    if(groups && groups.length > 0){
+        for(var i in groups){
+            var group = groups[i].split('-');
+            groupArray.push({permission : group[2], groupName : group[1], groupId : mongoose.Types.ObjectId(group[0])});
+        }
+    }
+    space.defaultSpace = false;
+    space.groups = groupArray;
+    space.userId = mongoose.Types.ObjectId(owner);
+    space.save(function (err, result) {
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": result});
+        }
+    });
+});
+
 module.exports = router;

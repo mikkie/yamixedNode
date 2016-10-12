@@ -31,4 +31,27 @@ router.post('/new', function (req, res) {
     });
 });
 
+
+router.get('/findGroupByName', function (req, res) {
+    Group.findOne({name : req.query.name},function(err,doc){
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": doc});
+        }
+    });
+});
+
+router.get('/findGroupByNameLike', function (req, res) {
+    Group.find({name : new RegExp(req.query.name,"i")},function(err,docs){
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": docs});
+        }
+    });
+});
+
 module.exports = router;

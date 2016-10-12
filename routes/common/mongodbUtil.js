@@ -23,7 +23,12 @@ var SpaceSchema = new Schema({
     spaceName : {type : String, index : true},
     userId : ObjectId,
     defaultSpace : Boolean,
-    createDate : { type: Date, default: Date.now }
+    createDate : { type: Date, default: Date.now },
+    groups : [{
+        groupName : String,
+        groupId : ObjectId,
+        permission : String
+    }]
 });
 
 //3.link
