@@ -10,8 +10,10 @@ router.post('/new', function (req, res) {
     var name = req.body.name;
     var users = req.body.users;
     var owner = req.body.owner;
+    var color = req.body.color;
     var group = new Group();
     group.name = name;
+    group.color = color;
     var userArray = [];
     if(users && users.length > 0){
        for(var i in users){
@@ -53,5 +55,18 @@ router.get('/findGroupByNameLike', function (req, res) {
         }
     });
 });
+
+
+router.get('/getUserCreatedGroups',function(req, res){
+    Group.find({owner : mongoose.Types.ObjectId(req.query.userId)},function(err,docs){
+        if(err){
+            res.json({"error" : err});
+        }
+        else{
+            res.json({"success" : docs});
+        }
+    });
+});
+
 
 module.exports = router;

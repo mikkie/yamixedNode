@@ -76,43 +76,89 @@ router.get('/findSpaceByName', function (req, res) {
     });
 });
 
-router.post('/new', function (req, res) {
-    var name = req.body.name;
-    var groups = req.body.groups;
-    var owner = req.body.owner;
-    var space = new Space();
-    space.spaceName = name;
-    var groupArray = [];
-    if(groups && groups.length > 0){
-        for(var i in groups){
-            var group = groups[i].split('-');
-            groupArray.push({permission : group[2], groupName : group[1], groupId : mongoose.Types.ObjectId(group[0])});
-        }
-    }
-    space.defaultSpace = false;
-    space.groups = groupArray;
-    space.userId = mongoose.Types.ObjectId(owner);
-    space.save(function (err, result) {
+
+router.get('/findSpaceById', function (req, res) {
+    Space.findOne({_id : mongoose.Types.ObjectId(req.query.spaceId)},function(err,doc){
         if (err) {
             res.json({"error": err});
         }
         else {
-            User.findOne({_id : mongoose.Types.ObjectId(owner)},function(err,doc){
-               var user = doc.toObject();
-               var createdSpace = user.space.created;
-               createdSpace.push(mongoose.Types.ObjectId(result.toObject()._id));
-               doc.space.created = createdSpace;
-               doc.save(function(err , result){
-                    if (err) {
-                        res.json({"error": err});
-                    }
-                    else{
-                        res.json({"success": result});
-                    }
-               });
-            });
+            res.json({"success": doc});
         }
     });
+});
+
+
+
+
+
+
+router.post('/new', function (req, res) {
+    var name = req.body.name;
+    var groups = req.body.groups;
+    var owner = req.body.owner;
+    var color = req.body.color;
+    var id = req.body.id;
+    var space = null;
+    if(id){
+        Space.findOne({_id : mongoose.Types.ObjectId(id)},function(err,doc){
+            if (err) {
+                res.json({"error": err});
+            }
+            else {
+                space = doc;
+                saveOrUpdateSpace(false);
+            }
+        });
+    }
+    else{
+        space = new Space();
+        space.spaceName = name;
+        space.color = color;
+        space.defaultSpace = false;
+        space.userId = mongoose.Types.ObjectId(owner);
+        saveOrUpdateSpace(true);
+    }
+    function saveOrUpdateSpace(isNew) {
+        var groupArray = [];
+        if (groups && groups.length > 0) {
+            for (var i in groups) {
+                var group = groups[i].split('-');
+                groupArray.push({
+                    permission: group[2],
+                    groupName: group[1],
+                    groupId: mongoose.Types.ObjectId(group[0])
+                });
+            }
+        }
+        space.groups = groupArray;
+        space.save(function (err, result) {
+            if (err) {
+                res.json({"error": err});
+            }
+            else {
+                if(isNew){
+                    User.findOne({_id: mongoose.Types.ObjectId(owner)}, function (err, doc) {
+                        var user = doc.toObject();
+                        var createdSpace = user.space.created;
+                        createdSpace.push(mongoose.Types.ObjectId(result.toObject()._id));
+                        doc.space.created = createdSpace;
+                        doc.save(function (err, result) {
+                            if (err) {
+                                res.json({"error": err});
+                            }
+                            else {
+                                res.json({"success": result});//here is user
+                            }
+                        });
+                    });
+                }
+                else{
+                    res.json({"success": result});//here is space
+                }
+            }
+        });
+    }
 });
 
 module.exports = router;
