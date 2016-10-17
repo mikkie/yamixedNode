@@ -95,6 +95,8 @@ var createDefaultSpace = function(user,res){
     space.spaceName = userO.userName + '的书签';
     space.userId = userO._id;
     space.defaultSpace = true;
+	space.groups = [];
+	space.color = common.randomColor('');
     space.save(function(err){
         if(err){
             res.json({"error" : "注册失败,创建空间错误"});
