@@ -204,6 +204,8 @@ var createJoinSpaceMsgs = function (space, addUsers) {
             var temp = TEMPLATE.MESSAGE.JOIN_SPACE;
             temp = temp.replace('{content}', user.userName + '邀请你加入' + space.spaceName);
             msg.content = temp;
+            msg.createDate = Date.now();
+            msg.valid = true;
             msgs.push(msg);
         }
         Message.collection.insert(msgs, function (err, docs) {
@@ -229,6 +231,8 @@ var createLeaveSpaceMsgs = function (space, removeUsers) {
             var temp = TEMPLATE.MESSAGE.LEAVE_SPACE;
             temp = temp.replace('{content}', user.userName + '把你移出' + space.spaceName);
             msg.content = temp;
+            msg.createDate = Date.now();
+            msg.valid = true;
             msgs.push(msg);
         }
         Message.collection.insert(msgs, function (err, docs) {
