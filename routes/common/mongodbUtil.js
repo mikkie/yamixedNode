@@ -56,10 +56,21 @@ var GroupSchema = new Schema({
     createDate : { type: Date, default: Date.now }
 });
 
+//5.message
+var MessageSchema = new Schema({
+    content : {type : String},
+    createDate : { type: Date, default: Date.now },
+    from : {type : String},
+    to : {type : String},
+    valid : {type : Boolean, default: true},
+    expireDate : {type: Date}
+});
+
 
 mongoose.model('User',UserSchema);
 mongoose.model('Space',SpaceSchema);
 mongoose.model('Link', LinkSchema);
 mongoose.model('Group', GroupSchema);
+mongoose.model('Message', MessageSchema);
 
 module.exports = mongoose;
