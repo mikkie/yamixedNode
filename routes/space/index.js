@@ -202,7 +202,8 @@ var createJoinSpaceMsgs = function (space, addUsers) {
             msg.to = addUser.userId;
             msg.from = space.userId;
             var temp = TEMPLATE.MESSAGE.JOIN_SPACE;
-            temp = temp.replace('{content}', user.userName + '邀请你加入' + space.spaceName);
+            temp = temp.replace('{content}', user.userName + '邀请你加入' + space.spaceName)
+                .replace('{userId}', msg.to).replace('{spaceId}', space._id);
             msg.content = temp;
             msg.createDate = Date.now();
             msg.valid = true;
@@ -213,6 +214,38 @@ var createJoinSpaceMsgs = function (space, addUsers) {
                 res.json({"error": err});
             }
         });
+    });
+};
+
+
+var removeUserFromSpace = function (userId, spaceId) {
+    User.findOne({_id: mongoose.Types.ObjectId(userId)}, function (err, doc) {
+        if (err) {
+            console.log(err);
+        }
+        else {
+            var user = doc.toObject();
+            var joinSpace = user.space.joined;
+            if (joinSpace.length > 0) {
+                var index = -1;
+                for (var i in joinSpace) {
+                    var space = joinSpace[i];
+                    if (space.toString() == spaceId) {
+                        index = i;
+                        break;
+                    }
+                }
+                if (index > -1) {
+                    joinSpace.splice(index, 1);
+                }
+            }
+            doc.space.joined = joinSpace;
+            doc.save(function (err, result) {
+                if (err) {
+                    console.log(err);
+                }
+            });
+        }
     });
 };
 
@@ -234,6 +267,7 @@ var createLeaveSpaceMsgs = function (space, removeUsers) {
             msg.createDate = Date.now();
             msg.valid = true;
             msgs.push(msg);
+            removeUserFromSpace(msg.to, space._id);
         }
         Message.collection.insert(msgs, function (err, docs) {
             if (err) {
@@ -326,6 +360,44 @@ router.post('/new', function (req, res) {
             }
         });
     }
+});
+
+
+router.post('/join', function (req, res) {
+    var userId = req.body.userId;
+    var spaceId = req.body.spaceId;
+    var messageId = req.body.spaceId;
+    User.findOne({_id: mongoose.Types.ObjectId(userId)}, function (err, doc) {
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            var user = doc.toObject();
+            var joinSpaces = user.space.joined;
+            if (joinSpaces.length == 0) {
+                joinSpaces.push(mongoose.Types.ObjectId(spaceId));
+            }
+            else {
+                for (var i in joinSpaces) {
+                    var space = joinSpaces[i];
+                    if (space.toString == spaceId) {
+                        res.json({"success": "spaceId已加入"});
+                        return;
+                    }
+                }
+                joinSpaces.push(mongoose.Types.ObjectId(spaceId));
+            }
+            doc.space.joined = joinSpaces;
+            doc.save(function (err, result) {
+                if (err) {
+                    res.json({"error": err});
+                }
+                else {
+                    res.json({"success": result});
+                }
+            });
+        }
+    });
 });
 
 module.exports = router;

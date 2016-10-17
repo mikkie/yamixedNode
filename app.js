@@ -23,6 +23,7 @@ var space = require('./routes/space');
 var link = require('./routes/link');
 var account = require('./routes/account');
 var group = require('./routes/group');
+var message = require('./routes/message');
 
 
 
@@ -56,6 +57,7 @@ app.use('/space',space);
 app.use('/link',link);
 app.use('/account',account);
 app.use('/group',group);
+app.use('/message',message);
 
 http.createServer(app).listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));

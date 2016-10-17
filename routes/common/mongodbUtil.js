@@ -60,8 +60,8 @@ var GroupSchema = new Schema({
 var MessageSchema = new Schema({
     content : {type : String},
     createDate : { type: Date, default: Date.now },
-    from : {type : String},
-    to : {type : String},
+    from : {type : ObjectId},
+    to : {type : ObjectId},
     valid : {type : Boolean, default: true},
     expireDate : {type: Date}
 });
