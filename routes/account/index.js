@@ -62,5 +62,17 @@ router.get('/getUsersByNameOrEmail', function (req, res) {
 });
 
 
+router.get('/getUserById', function (req, res) {
+    User.findOne({_id : mongoose.Types.ObjectId(req.query.userId)},function(err,doc){
+        if(err){
+            res.json({"error" : err});
+        }
+        else{
+            res.json({"success": doc});
+        }
+    });
+});
+
+
 
 module.exports = router;
