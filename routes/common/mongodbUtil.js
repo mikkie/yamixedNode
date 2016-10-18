@@ -12,6 +12,10 @@ var UserSchema = new Schema({
 	   password : String,
 	   joinDate : { type: Date, default: Date.now },
 	   loginDate : { type: Date, default: Date.now },
+       avatar : {
+          color : {type : String, default: 'ffffff'},
+          alphabet : {type : String, default: 'U'}
+       },
        space : {
           created : [ObjectId],
           joined : [ObjectId]

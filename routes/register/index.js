@@ -64,6 +64,8 @@ router.post('/createUser',function(req, res,next){
 	var user = new User();
 	user.userName = name;
 	user.email = email;
+	user.avatar.color = common.randomColor('');
+    user.avatar.alphabet = name.substring(0,1).toUpperCase();
 	user.password = crypto.createHash('md5').update(password).digest("hex");
 	user.save(function(err,result){
 		if(err){
