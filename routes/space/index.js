@@ -400,4 +400,51 @@ router.post('/join', function (req, res) {
     });
 });
 
+
+router.get('/checkRWPermission', function (req, res) {
+    var spaceId = req.query.spaceId;
+    var userId = req.query.userId;
+    Space.findOne({_id: mongoose.Types.ObjectId(spaceId)}, function (err, doc) {
+        var groups = doc.toObject().groups;
+        var gIds = [];
+        if (groups && groups.length > 0) {
+            for (var i in groups) {
+                if (groups[i].permission == 'rw') {
+                    gIds.push(groups[i].groupId);
+                }
+            }
+        }
+        if (gIds.length > 0) {
+            Group.find({_id: {$in: gIds}}, function (err, docs) {
+                if (err) {
+                    res.json({"error": err});
+                }
+                else {
+                    if (docs.length > 0) {
+                        for (var i in docs) {
+                            var doc = docs[i].toObject();
+                            if (doc.users && doc.users.length > 0) {
+                                for (var i in doc.users) {
+                                    var user = doc.users[i];
+                                    if (user.userId.toString() == userId) {
+                                        res.json({"success": "rw"});
+                                        return;
+                                    }
+                                }
+                                res.json({"success": "r"});
+                            }
+                        }
+                    }
+                    else {
+                        res.json({"success": "r"});
+                    }
+                }
+            })
+        }
+        else {
+            res.json({"success": "r"});
+        }
+    });
+});
+
 module.exports = router;
