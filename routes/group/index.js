@@ -4,7 +4,8 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('../common/mongodbUtil'),
-    Group = mongoose.model('Group');
+    Group = mongoose.model('Group'),
+    gsService = require('../service/groupSpaceService.js');
 
 router.post('/new', function (req, res) {
     var name = req.body.name;
@@ -13,6 +14,7 @@ router.post('/new', function (req, res) {
     var color = req.body.color;
     var id = req.body.id;
     var group = null;
+    var oldUsers = [];
     if(id){
         Group.findOne({_id : mongoose.Types.ObjectId(id)},function(err,doc){
             if (err) {
@@ -20,6 +22,7 @@ router.post('/new', function (req, res) {
             }
             else {
                 group = doc;
+                oldUsers = group.toObject().users;
                 saveOrUpdateGroup();
             }
         });
@@ -45,6 +48,7 @@ router.post('/new', function (req, res) {
                 res.json({"error": err});
             }
             else {
+                gsService.informUserJoinSpaceAfterGroupEdit(result.toObject(), oldUsers);
                 res.json({"success": result});
             }
         });
