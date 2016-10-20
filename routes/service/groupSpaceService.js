@@ -1,4 +1,5 @@
 var mongoose = require('../common/mongodbUtil'),
+    common = require('../common/common.js'),
     TEMPLATE = require('../template/temp.js'),
     User = mongoose.model('User'),
     Space = mongoose.model('Space'),
@@ -135,7 +136,7 @@ var createJoinSpaceMsgs = function (space, addUsers) {
 };
 
 
-var removeUserFromSpace = function (userId, spaceId) {
+var removeUserFromSpace = function (userId, spaceId,deferred) {
     User.findOne({_id: mongoose.Types.ObjectId(userId)}, function (err, doc) {
         if (err) {
             console.log(err);
@@ -147,9 +148,10 @@ var removeUserFromSpace = function (userId, spaceId) {
                 var index = -1;
                 for (var i in joinSpace) {
                     var space = joinSpace[i];
+                    console.log(userId + ' spaceId=' + space.toString());
                     if (space.toString() == spaceId) {
                         index = i;
-                        break;
+                        //break;
                     }
                 }
                 if (index > -1) {
@@ -160,6 +162,10 @@ var removeUserFromSpace = function (userId, spaceId) {
             doc.save(function (err, result) {
                 if (err) {
                     console.log(err);
+                }
+                console.log('remove ' + userId + ' from ' + spaceId);
+                if(deferred){
+                    deferred.resolve();
                 }
             });
         }
@@ -207,7 +213,8 @@ var informUserJoinSpace = function (space, oldGroups) {
 };
 
 
-var notifyUserRemoveSpaceIfNeed = function (space, user) {
+var notifyUserRemoveSpaceIfNeed = function (user,space) {
+    var deferred = Q.defer();
     User.findOne({_id: mongoose.Types.ObjectId(user.userId)}, function (err, doc) {
         if (!err) {
             var userO = doc.toObject();
@@ -229,17 +236,19 @@ var notifyUserRemoveSpaceIfNeed = function (space, user) {
                     msg.content = temp;
                     msg.createDate = Date.now();
                     msg.valid = true;
-                    removeUserFromSpace(msg.to, space._id);
+                    removeUserFromSpace(msg.to, space._id,deferred);
                     msg.save(function (err, doc) {
                     });
                 });
             }
         }
     });
+    return deferred.promise;
 };
 
 
-var notifyUserAddSpaceIfNeed = function(space, user){
+var notifyUserAddSpaceIfNeed = function(user,space){
+    var deferred = Q.defer();
     User.findOne({_id: mongoose.Types.ObjectId(user.userId)}, function (err, doc) {
         if (!err) {
             var userO = doc.toObject();
@@ -263,11 +272,13 @@ var notifyUserAddSpaceIfNeed = function(space, user){
                     msg.createDate = Date.now();
                     msg.valid = true;
                     msg.save(function (err, doc) {
+                        deferred.resolve();
                     });
                 });
             }
         }
     });
+    return deferred.promise;
 };
 
 var informUserJoinSpaceAfterGroupEdit = function (group, oldUsers) {
@@ -286,19 +297,28 @@ var informUserJoinSpaceAfterGroupEdit = function (group, oldUsers) {
     }, function (err, docs) {
         if (!err) {
             if (docs && docs.length > 0) {
-                for (var i in docs) {
-                    var space = docs[i].toObject();
-                    for (var j in addUsers) {
-                        notifyUserAddSpaceIfNeed(space, addUsers[j]);
-                    }
-                    for(var k in removeUsers){
-                        notifyUserRemoveSpaceIfNeed(space, removeUsers[k]);
-                    }
-                }
+                common.forEachPromise(null,0,docs,function(doc){
+                    var outerDeferred = Q.defer();
+                    var space = doc.toObject();
+                    (function(){
+                        var deferred = Q.defer();
+                        common.forEachPromise(deferred,0,addUsers,notifyUserAddSpaceIfNeed,space);
+                        return deferred.promise;
+                    })().then(function(){
+                        common.forEachPromise(outerDeferred,0,removeUsers,notifyUserRemoveSpaceIfNeed,space);
+                    });
+                    return outerDeferred.promise;
+                });
             }
         }
     });
 };
+
+
+
+
+
+
 
 
 module.exports = {
