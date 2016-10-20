@@ -244,4 +244,16 @@ router.get('/checkRWPermission', function (req, res) {
     });
 });
 
+
+router.get('/disableSpace', function (req, res) {
+   Space.findOneAndUpdate({_id:mongoose.Types.ObjectId(req.query.spaceId)},{$set:{valid:false}},function(err,doc){
+       if(err){
+           res.json({"error": err});
+       }
+       else{
+           res.json({"success": doc});
+       }
+   });
+});
+
 module.exports = router;

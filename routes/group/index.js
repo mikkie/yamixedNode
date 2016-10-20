@@ -79,7 +79,7 @@ router.get('/findGroupById', function (req, res) {
 });
 
 router.get('/findGroupByNameLike', function (req, res) {
-    Group.find({name : new RegExp(req.query.name,"i")},function(err,docs){
+    Group.find({name : new RegExp(req.query.name,"i"),valid:true,owner : mongoose.Types.ObjectId(req.query.owner)},function(err,docs){
         if (err) {
             res.json({"error": err});
         }
@@ -101,5 +101,16 @@ router.get('/getUserCreatedGroups',function(req, res){
     });
 });
 
+
+router.get('/disableGroup', function (req, res) {
+    Group.findOneAndUpdate({_id:mongoose.Types.ObjectId(req.query.groupId)},{$set:{valid:false}},function(err,doc){
+        if(err){
+            res.json({"error": err});
+        }
+        else{
+            res.json({"success": doc});
+        }
+    });
+});
 
 module.exports = router;

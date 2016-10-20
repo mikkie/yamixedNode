@@ -29,6 +29,7 @@ var SpaceSchema = new Schema({
     defaultSpace : Boolean,
     createDate : { type: Date, default: Date.now },
     color : {type : String},
+    valid : {type : Boolean, default : true},
     groups : [{
         groupName : String,
         groupId : ObjectId,
@@ -55,6 +56,7 @@ var GroupSchema = new Schema({
         userName : String,
         userId : ObjectId
     }],
+    valid : {type : Boolean, default : true},
     color : {type : String},
     owner : ObjectId,
     createDate : { type: Date, default: Date.now }
