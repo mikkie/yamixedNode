@@ -293,7 +293,8 @@ var informUserJoinSpaceAfterGroupEdit = function (group, oldUsers) {
                     $all: [group._id]
                 }
             }
-        }
+        },
+        valid : true
     }, function (err, docs) {
         if (!err) {
             if (docs && docs.length > 0) {

@@ -27,7 +27,7 @@ var getSpacesByIds = function (ids, res) {
         res.json({"error": "??????id"});
         return;
     }
-    Space.find({_id: {"$in": conditions}}, function (err, docs) {
+    Space.find({_id: {"$in": conditions},valid:true}, function (err, docs) {
         if (err) {
             res.json({"error": "????????"});
         }
@@ -64,7 +64,7 @@ router.get('/getUserCreatedSpaces', function (req, res) {
 
 
 router.get('/findSpaceByName', function (req, res) {
-    Space.findOne({spaceName: req.query.name}, function (err, doc) {
+    Space.findOne({spaceName: req.query.name,valid:true}, function (err, doc) {
         if (err) {
             res.json({"error": err});
         }
