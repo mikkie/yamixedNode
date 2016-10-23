@@ -7,8 +7,11 @@ var express = require('express'),
     Space = mongoose.model('Space'),
     User = mongoose.model('User'),
     Group = mongoose.model('Group'),
+    Link = mongoose.model('Link'),
     gsService = require('../service/groupSpaceService.js');
 
+
+var bookmarksCache = {};
 
 var getSpacesByIds = function (ids, res) {
     if (!ids) {
@@ -27,7 +30,7 @@ var getSpacesByIds = function (ids, res) {
         res.json({"error": "??????id"});
         return;
     }
-    Space.find({_id: {"$in": conditions},valid:true}, function (err, docs) {
+    Space.find({_id: {"$in": conditions}, valid: true}, function (err, docs) {
         if (err) {
             res.json({"error": "????????"});
         }
@@ -64,7 +67,7 @@ router.get('/getUserCreatedSpaces', function (req, res) {
 
 
 router.get('/findSpaceByName', function (req, res) {
-    Space.findOne({spaceName: req.query.name,valid:true}, function (err, doc) {
+    Space.findOne({spaceName: req.query.name, valid: true}, function (err, doc) {
         if (err) {
             res.json({"error": err});
         }
@@ -246,14 +249,65 @@ router.get('/checkRWPermission', function (req, res) {
 
 
 router.get('/disableSpace', function (req, res) {
-   Space.findOneAndUpdate({_id:mongoose.Types.ObjectId(req.query.spaceId)},{$set:{valid:false}},function(err,doc){
-       if(err){
-           res.json({"error": err});
+    Space.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.query.spaceId)}, {$set: {valid: false}}, function (err, doc) {
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": doc});
+        }
+    });
+});
+
+
+var createTags = function(node){
+  var pId = node.parentId;
+  var parent = bookmarksCache[pId];
+  var tags = [];
+  while(parent && parent.id != 0 && parent.id != 1 && parent.id != 2 && parent.title){
+      tags.unshift(parent.title);
+      pId = parent.parentId;
+      if(!pId){
+        return tags;
+      }
+      parent = bookmarksCache[pId];
+  }
+  return tags;
+};
+
+var createLink = function(node,spaceId){
+  var link = new Link();
+  link.url = node.url;
+  link.title = node.title;
+  link.description = '';
+  link.previewImg = '';
+  link.content = '';
+  link.spaceId = mongoose.Types.ObjectId(spaceId);
+  link.tags = createTags(node);
+  link.save(function(err,doc){
+  });
+};
+
+var syncBookMark = function(nodes,spaceId){
+  if(nodes instanceof Array){
+     for(var i in nodes){
+       var node = nodes[i];
+       if(node.children){
+         bookmarksCache[node.id] = node;
+         syncBookMark(node.children,spaceId);
        }
-       else{
-           res.json({"success": doc});
+       else if(node.url){
+         createLink(node,spaceId);
        }
-   });
+     }
+  }
+};
+
+router.post('/init', function (req, res) {
+    var nodes = req.body.nodes;
+    var spaceId = req.body.spaceId;
+    syncBookMark(nodes,spaceId);
+    res.json({"success": nodes});
 });
 
 module.exports = router;
