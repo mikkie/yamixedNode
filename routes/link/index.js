@@ -60,6 +60,9 @@ router.post('/searchLinks', function (req, res) {
     };
     if(req.body.keyword){
         condition.$or = [{title: new RegExp(req.body.keyword, "i")}, {description: new RegExp(req.body.keyword, "i")}];
+        if(req.body.keyword.length > 10){
+            condition.$or.push({content: new RegExp(req.body.keyword, "i")});
+        }
     }
     if (req.body.tag) {
         condition.tags = req.body.tag
@@ -102,6 +105,30 @@ router.post('/getLinkById', function (req, res) {
     Link.findOne({_id: mongoose.Types.ObjectId(req.body.linkId)},function(err,doc){
         if (err) {
             res.json({"error": "获取Link失败" + req.body.linkId});
+        }
+        else {
+            res.json({"success": doc});
+        }
+    });
+});
+
+
+router.post('/findLinkByUrlAndOwner', function (req, res) {
+    Link.find({url: req.body.url, owner : mongoose.Types.ObjectId(req.body.owner)},function(err,docs){
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            res.json({"success": docs});
+        }
+    });
+});
+
+
+router.post('/updateContent', function (req, res) {
+    Link.findOneAndUpdate({_id: req.body.linkId},{$set : {content : req.body.content}},function(err,doc){
+        if (err) {
+            res.json({"error": err});
         }
         else {
             res.json({"success": doc});
