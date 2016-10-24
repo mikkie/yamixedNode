@@ -45,6 +45,7 @@ var LinkSchema = new Schema({
     previewImg : String,
     content : String,
     spaceId : ObjectId,
+    owner : ObjectId,
     tags : [String],
     lastVisitTime :{ type: Date, default: Date.now }
 });

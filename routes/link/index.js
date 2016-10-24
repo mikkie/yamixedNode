@@ -29,6 +29,7 @@ router.post('/postNewLink', function (req, res) {
         link.description = req.body.description;
         link.previewImg = req.body.previewImg;
         link.spaceId = mongoose.Types.ObjectId(req.body.spaceId);
+        link.owner = mongoose.Types.ObjectId(req.body.owner);
         link.tags = req.body.tags;
         link.save(function (err, result) {
             if (err) {

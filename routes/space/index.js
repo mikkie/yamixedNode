@@ -275,7 +275,7 @@ var createTags = function(node){
   return tags;
 };
 
-var createLink = function(node,spaceId){
+var createLink = function(node,spaceId,owner){
   var link = new Link();
   link.url = node.url;
   link.title = node.title;
@@ -283,21 +283,22 @@ var createLink = function(node,spaceId){
   link.previewImg = '';
   link.content = '';
   link.spaceId = mongoose.Types.ObjectId(spaceId);
+  link.owner = mongoose.Types.ObjectId(owner);
   link.tags = createTags(node);
   link.save(function(err,doc){
   });
 };
 
-var syncBookMark = function(nodes,spaceId){
+var syncBookMark = function(nodes,spaceId,owner){
   if(nodes instanceof Array){
      for(var i in nodes){
        var node = nodes[i];
        if(node.children){
          bookmarksCache[node.id] = node;
-         syncBookMark(node.children,spaceId);
+         syncBookMark(node.children,spaceId,owner);
        }
        else if(node.url){
-         createLink(node,spaceId);
+         createLink(node,spaceId,owner);
        }
      }
   }
@@ -306,7 +307,8 @@ var syncBookMark = function(nodes,spaceId){
 router.post('/init', function (req, res) {
     var nodes = req.body.nodes;
     var spaceId = req.body.spaceId;
-    syncBookMark(nodes,spaceId);
+    var owner = req.body.owner;
+    syncBookMark(nodes,spaceId,owner);
     res.json({"success": nodes});
 });
 
