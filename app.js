@@ -25,6 +25,7 @@ var link = require('./routes/link');
 var account = require('./routes/account');
 var group = require('./routes/group');
 var message = require('./routes/message');
+var note = require('./routes/note');
 
 var key = fs.readFileSync('./cert/yamixed.key');
 var cert = fs.readFileSync('./cert/yamixed.crt');
@@ -65,6 +66,7 @@ app.use('/link', link);
 app.use('/account', account);
 app.use('/group', group);
 app.use('/message', message);
+app.use('/note', note);
 
 https.createServer(https_options, app).listen(app.get('port'), function () {
     console.log('Express server listening on port ' + app.get('port'));

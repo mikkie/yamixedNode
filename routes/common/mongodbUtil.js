@@ -74,10 +74,29 @@ var MessageSchema = new Schema({
 });
 
 
+//6.note
+var NoteSchema = new Schema({
+    url : {type : String,index : true},
+    owner : { type : ObjectId },
+    notes : [
+       {
+           sentence : {type : String},
+           content : {type : String},
+           color : {type : String, default: 'fbad18'},
+           valid : {type : Boolean, default: true},
+           createDate : {type: Date, default: Date.now},
+           x : {type : String},
+           y : {type : String}
+       }
+    ]
+});
+
+
 mongoose.model('User',UserSchema);
 mongoose.model('Space',SpaceSchema);
 mongoose.model('Link', LinkSchema);
 mongoose.model('Group', GroupSchema);
 mongoose.model('Message', MessageSchema);
+mongoose.model('Note', NoteSchema);
 
 module.exports = mongoose;
