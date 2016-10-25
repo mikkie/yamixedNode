@@ -61,6 +61,44 @@ router.post('/new', function (req, res) {
     });
 });
 
+router.post('/delete', function (req, res) {
+    Note.find({url : req.body.url,owner : mongoose.Types.ObjectId(req.body.owner)},function(err,docs){
+        if(err){
+            res.json({"error":err});
+        }
+        else{
+            if(docs.length > 0){
+                var note = docs[0];
+                if(req.body.id && note.notes.length > 0){
+                    for(var i = 0; i < note.notes.length; i++){
+                        if(note.notes[i].toObject()._id.toString() == req.body.id){
+                            note.notes[i].valid = false;
+                            note.notes[i].createDate = new Date();
+                            break;
+                        }
+                    }
+                    note.save(function(err,doc){
+                        if(err){
+                            res.json({"error":err});
+                        }
+                        else{
+                            var noteO = doc.toObject();
+                            var notes = noteO.notes;
+                            notes.sort(function(a,b){
+                                return a.createDate - b.createDate;
+                            });
+                            var detail = notes[notes.length - 1];
+                            detail.url = noteO.url;
+                            detail.owner = noteO.owner;
+                            res.json({"success":detail});
+                        }
+                    });
+                }
+            }
+        }
+    });
+});
+
 
 router.post('/search', function (req, res) {
     Note.find({url : req.body.url,owner : mongoose.Types.ObjectId(req.body.owner)},function(err,docs){
