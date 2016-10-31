@@ -85,6 +85,8 @@ var NoteSchema = new Schema({
            color : {type : String, default: 'fbad18'},
            valid : {type : Boolean, default: true},
            createDate : {type: Date, default: Date.now},
+           space : { type : ObjectId, index : true},
+           link : { type : ObjectId, index : true},
            x : {type : String},
            y : {type : String}
        }
