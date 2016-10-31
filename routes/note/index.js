@@ -39,6 +39,7 @@ router.post('/new', function (req, res) {
                }
             }
             else{
+                createLink(req.body.url,req.body.space,req.body.owner,req.body.sentence,req.body.content);
                 note.notes.push(detail);
             }
             note.save(function(err,doc){
@@ -60,6 +61,18 @@ router.post('/new', function (req, res) {
         }
     });
 });
+
+
+var createLink = function(url,space,owner,sentence,content){
+    var link = new Link();
+    link.url = url;
+    link.title = sentence;
+    link.description = content;
+    link.previewImg = '';
+    link.spaceId = mongoose.Types.ObjectId(space);
+    link.owner = mongoose.Types.ObjectId(owner);
+    link.save(function (err, result) {});
+};
 
 router.post('/delete', function (req, res) {
     Note.find({url : req.body.url,owner : mongoose.Types.ObjectId(req.body.owner)},function(err,docs){
