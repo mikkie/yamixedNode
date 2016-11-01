@@ -26,15 +26,15 @@ router.post('/autoLogin',function(req,res,next){
 					res.json({"success" : userO});
 				}
 				else{
-					res.json({"error" : "token 错误"});
+					res.json({"error" : "token error"});
 				}
 			}
 			else{
-				res.json({"error" : "用户不存在"});
+				res.json({"error" : "user not exist"});
 			}
 		}
 		else{
-			res.json({"error" : "服务器开小差了"});
+			res.json({"error" : "server is busy"});
 		}
 	});
 });
@@ -58,20 +58,20 @@ router.post('/go',function(req, res,next){
 							res.json({"success" : newUser});
 						}
 						else{
-							res.json({"error" : "服务器开小差了"});
+							res.json({"error" : "server is busy"});
 						}
 					});
 				}
 				else{
-					res.json({"error_pwd" : "密码错误"});
+					res.json({"error_pwd" : "password error"});
 				}
 			}
 			else{
-				res.json({"error_user" : "用户不存在"});
+				res.json({"error_user" : "user not exist"});
 			}
 		}
 		else{
-			res.json({"error" : "服务器开小差了"});
+			res.json({"error" : "server is busy"});
 		}
 	});
 });

@@ -32,7 +32,7 @@ var getSpacesByIds = function (ids, res) {
     }
     Space.find({_id: {"$in": conditions}, valid: true}, function (err, docs) {
         if (err) {
-            res.json({"error": "????????"});
+            res.json({"error": err});
         }
         else {
             res.json({"success": docs});
