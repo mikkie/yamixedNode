@@ -17,13 +17,13 @@ router.post('/postUpdateUser', function (req, res) {
            user.password = password;
            user.save(function(err,doc){
                if (err) {
-                   res.json({"error": "更新用户密码错误" + req.body.userId});
+                   res.json({"error": "fail to update password" + req.body.userId});
                }
            });
        }
        Space.findOne({userId : req.body.userId, defaultSpace : true},function(err,doc){
            if(err){
-               res.json({"error": "获取用户失败" + req.body.userId});
+               res.json({"error": "get user failed" + req.body.userId});
                return;
            }
            var docO = doc.toObject();
@@ -34,12 +34,12 @@ router.post('/postUpdateUser', function (req, res) {
            doc.defaultSpace = false;
            doc.save(function(err, doc){
                if(err){
-                   res.json({"error": "更新默认空间失败" + req.body.userId});
+                   res.json({"error": "fail to update default space" + req.body.userId});
                }
                else{
                    Space.findOneAndUpdate({_id : mongoose.Types.ObjectId(req.body.spaceId)},{$set:{defaultSpace:true}},function(err,doc){
                        if(err){
-                           res.json({"error": "更新默认空间失败" + req.body.userId});
+                           res.json({"error": "fail to update default space" + req.body.userId});
                        }
                        else{
                            res.json({"success": user});

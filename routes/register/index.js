@@ -15,14 +15,14 @@ router.get('/checkName/:name', function(req, res,next) {
 	 User.findOne({userName:name},function(err,user){
 	     if(!err){
 	    	 if(user){
-	    		 res.json({"error" : "用户已存在"});
+	    		 res.json({"error" : "user exist"});
 	    	 }
 	    	 else{
-	    		 res.json({"success" : "用户名可以使用"});
+	    		 res.json({"success" : "name available"});
 	    	 }
 	     }
 	     else{
-	    	 res.json({"error" : "服务器开小差了"});
+	    	 res.json({"error" : "server is busy"});
 	     }
 	 });  
 });
@@ -35,23 +35,23 @@ router.get('/checkEmail/:flag/:email', function(req, res,next) {
 	     if(!err){
 	    	 if(user){
 	    		 if(flag.toLowerCase() === 'y'){
-	    			 res.json({"error" : "邮箱已存在"});
+	    			 res.json({"error" : "email exist"});
 	    		 }
 	    		 else{
-	    			 res.json({"success" : "邮箱存在"});
+	    			 res.json({"success" : "email exist"});
 	    		 }
 	    	 }
 	    	 else{
 	    		 if(flag.toLowerCase() === 'y'){
-	    			 res.json({"success" : "邮箱可以使用"});
+	    			 res.json({"success" : "email available"});
 	    		 }
 	    		 else{
-	    			 res.json({"error" : "邮箱不存在"});
+	    			 res.json({"error" : "email not exist"});
 	    		 }
 	    	 }
 	     }
 	     else{
-	    	 res.json({"error" : "服务器开小差了"});
+	    	 res.json({"error" : "server is busy"});
 	     }
 	 });  
 });
@@ -69,7 +69,7 @@ router.post('/createUser',function(req, res,next){
 	user.password = crypto.createHash('md5').update(password).digest("hex");
 	user.save(function(err,result){
 		if(err){
-			res.json({"error" : "注册失败"});
+			res.json({"error" : "register failed"});
 		}
 		else{
             createDefaultSpace(user,res);
@@ -83,7 +83,7 @@ var updateUserCreatedSpace = function(user,space,res){
     createdSpaces.push(spaceO._id);
     user.save(function(err,result){
         if(err){
-            res.json({"error" : "注册失败,更新用户空间失败"});
+            res.json({"error" : "register fail,update user space fail"});
         }
         else{
             res.json({"success" : result.toObject()});
@@ -94,14 +94,14 @@ var updateUserCreatedSpace = function(user,space,res){
 var createDefaultSpace = function(user,res){
     var userO = user.toObject();
     var space = new Space();
-    space.spaceName = userO.userName + '的书签';
+    space.spaceName = userO.userName + ' space';
     space.userId = userO._id;
     space.defaultSpace = true;
 	space.groups = [];
 	space.color = common.randomColor('');
     space.save(function(err){
         if(err){
-            res.json({"error" : "注册失败,创建空间错误"});
+            res.json({"error" : "register fail,create space error"});
         }
         else{
             updateUserCreatedSpace(user,space,res);
