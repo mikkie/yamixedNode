@@ -7,7 +7,9 @@ var express = require('express'),
         mongoose = require('../common/mongodbUtil'),
         User = mongoose.model('User'),
         Space = mongoose.model('Space'),
-		common = require('../common/common');
+		common = require('../common/common'),
+        fs = require('fs'),
+        emailUtil = require('../email/mailUtil');
 
 //check name
 router.get('/checkName/:name', function(req, res,next) {
@@ -114,9 +116,40 @@ var createDefaultSpace = function(user,res){
 router.post('/resetPwdConfirm',function(req, res,next){
 	var email = req.body.email;
 	var newPwd = common.generateRandomNum(6);
-	//TODO  send a email with new password
-	res.json({"success" : "重置密码邮件已发送至 " + email + "，请确认"});
+    var encryptPwd = crypto.createHash('md5').update(newPwd).digest("hex");
+    User.findOneAndUpdate({email:email},{$set:{password:encryptPwd}},function(err,user){
+        if(err){
+            res.json({"error" : err});
+        }
+        else{
+            if(!user){
+                res.json({"error" : "user not exist"});
+                return;
+            }
+            fs.readFile('emailTemp/forgetPwd.html', 'utf8',function (err, html) {
+                if (err) {
+                    logger.error('can not render params error page ' + err);
+                    res.json({"error" : err});
+                    return;
+                }
+                var userO = user.toObject();
+                var html = buildEmail(html,userO.userName,newPwd);
+                try{
+                    emailUtil.sendMail(userO.email,'Reset Yamixed password','',html);
+                }
+                catch(e){
+                    console.log(e);
+                }
+            });
+            res.json({"success" : "重置密码邮件已发送至 " + email + "，请确认"});
+        }
+    });
 });
+
+
+var buildEmail = function(html,name,pwd){
+   return html.replace('{username}',name).replace('{password}',pwd);
+};
 
 
 module.exports = router;
