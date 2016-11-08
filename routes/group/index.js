@@ -91,7 +91,7 @@ router.get('/findGroupByNameLike', function (req, res) {
 
 
 router.get('/getUserCreatedGroups',function(req, res){
-    Group.find({owner : mongoose.Types.ObjectId(req.query.userId)},function(err,docs){
+    Group.find({owner : mongoose.Types.ObjectId(req.query.userId),valid : true},function(err,docs){
         if(err){
             res.json({"error" : err});
         }
