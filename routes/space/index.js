@@ -47,7 +47,7 @@ router.post('/getUserSpace', function (req, res) {
 
 
 router.get('/getUserCreatedSpaces', function (req, res) {
-    User.findOne({_id: mongoose.Types.ObjectId(req.query.userId)}, function (err, doc) {
+    User.findOne({_id: mongoose.Types.ObjectId(req.query.userId),valid:true}, function (err, doc) {
         if (err) {
             res.json({"error": err});
         }
