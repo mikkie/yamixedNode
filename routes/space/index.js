@@ -13,7 +13,7 @@ var express = require('express'),
 
 var bookmarksCache = {};
 
-var getSpacesByIds = function (ids, res) {
+var getSpacesByIds = function (ids, res,valid) {
     if (!ids) {
         res.json({"error": "??????id"});
         return;
@@ -30,7 +30,7 @@ var getSpacesByIds = function (ids, res) {
         res.json({"error": "??????id"});
         return;
     }
-    Space.find({_id: {"$in": conditions}, valid: true}, function (err, docs) {
+    Space.find({_id: {"$in": conditions}, valid:valid === undefined?true:valid}, function (err, docs) {
         if (err) {
             res.json({"error": err});
         }
@@ -47,8 +47,8 @@ router.post('/getUserSpace', function (req, res) {
 
 
 router.get('/getUserCreatedSpaces', function (req, res) {
-    User.findOne({_id: mongoose.Types.ObjectId(req.query.userId)}, function (err, doc) {
-        if (err) {
+    User.findOne({_id : mongoose.Types.ObjectId(req.query.userId)}, function (err, doc) {
+        if (err || !doc) {
             res.json({"error": err});
         }
         else {
@@ -59,7 +59,7 @@ router.get('/getUserCreatedSpaces', function (req, res) {
                     spaceIds += spaces.created[i] + ',';
                 }
                 spaceIds = spaceIds.substring(0, spaceIds.length - 1);
-                getSpacesByIds(spaceIds, res);
+                getSpacesByIds(spaceIds, res,req.query.valid);
             }
         }
     });
