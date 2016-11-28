@@ -7,7 +7,7 @@ var transporter = nodemailer.createTransport({
     "secureConnection": true, // use SSL
     "auth": {
         "user": 'webmaster@notice.yamixed.com', // user name
-        "pass": 'true2green'         // password
+        "pass": 'Kis212SsAVfmo88nnnM'         // password
     }
 });
 

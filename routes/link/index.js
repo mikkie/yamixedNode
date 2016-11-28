@@ -4,25 +4,30 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('../common/mongodbUtil'),
-    Link = mongoose.model('Link');
+    Link = mongoose.model('Link'),
+    User = mongoose.model('User');
 
 router.post('/postNewLink', function (req, res) {
     var id = req.body._id;
-    if(id){
+    if (id) {
         Link.findByIdAndUpdate(mongoose.Types.ObjectId(id),
-            { $set: { title : req.body.title, description : req.body.description,
-                previewImg : req.body.previewImg,tags : req.body.tags,
-                spaceId : mongoose.Types.ObjectId(req.body.spaceId),
-                lastVisitTime:new Date()}}, { new: true }, function (err, doc) {
+            {
+                $set: {
+                    title: req.body.title, description: req.body.description,
+                    previewImg: req.body.previewImg, tags: req.body.tags,
+                    spaceId: mongoose.Types.ObjectId(req.body.spaceId),
+                    lastVisitTime: new Date()
+                }
+            }, {new: true}, function (err, doc) {
                 if (err) {
                     res.json({"error": "更新链接失败" + id});
                 }
                 else {
                     res.json({"success": doc});
                 }
-        });
+            });
     }
-    else{
+    else {
         var link = new Link();
         link.url = req.body.url;
         link.title = req.body.title;
@@ -58,9 +63,9 @@ router.post('/searchLinks', function (req, res) {
     var condition = {
         spaceId: mongoose.Types.ObjectId(req.body.spaceId),
     };
-    if(req.body.keyword){
+    if (req.body.keyword) {
         condition.$or = [{title: new RegExp(req.body.keyword, "i")}, {description: new RegExp(req.body.keyword, "i")}];
-        if(req.body.keyword.length > 10){
+        if (req.body.keyword.length > 10) {
             condition.$or.push({content: new RegExp(req.body.keyword, "i")});
         }
     }
@@ -69,7 +74,7 @@ router.post('/searchLinks', function (req, res) {
     }
     Link.find(condition).sort({lastVisitTime: -1}).exec(function (err, result) {
         if (err) {
-            res.json({"error": "??????"});
+            res.json({"error": err});
         }
         else {
             res.json({"success": result});
@@ -77,8 +82,46 @@ router.post('/searchLinks', function (req, res) {
     });
 });
 
+
+router.post('/searchLinksFromAddressBar', function (req, res) {
+    User.findOne({_id: req.body.userId}, function (err, doc) {
+        if (err) {
+            res.json({"error": err});
+        }
+        else {
+            if(!doc){
+                res.json({"error": "no user"});
+                return;
+            }
+            var user = doc.toObject();
+            var spaceIds = [];
+            for (var i in user.space.created) {
+                spaceIds.push(user.space.created[i]);
+            }
+            if(user.space.joined.length > 0){
+                for(var i in user.space.joined){
+                    spaceIds.push(user.space.joined[i]);
+                }
+            }
+            var condition = {
+                $or : [{title: new RegExp(req.body.keyword, "i")}, {description: new RegExp(req.body.keyword, "i")}],
+                spaceId : {$in : spaceIds}
+            };
+            Link.find(condition).sort({lastVisitTime: -1}).exec(function (err, result) {
+                if (err) {
+                    res.json({"error": err});
+                }
+                else {
+                    res.json({"success": result});
+                }
+            });
+        }
+    });
+});
+
+
 router.post('/updateLinkVisitTime', function (req, res) {
-    Link.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.linkId)}, {$set:{lastVisitTime:new Date()}},function(err, doc){
+    Link.findOneAndUpdate({_id: mongoose.Types.ObjectId(req.body.linkId)}, {$set: {lastVisitTime: new Date()}}, function (err, doc) {
         if (err) {
             res.json({"error": "更新lastVisitTime失败"});
         }
@@ -90,7 +133,7 @@ router.post('/updateLinkVisitTime', function (req, res) {
 
 
 router.post('/deleteLink', function (req, res) {
-    Link.findOneAndRemove({_id: mongoose.Types.ObjectId(req.body.linkId)},function(err){
+    Link.findOneAndRemove({_id: mongoose.Types.ObjectId(req.body.linkId)}, function (err) {
         if (err) {
             res.json({"error": "删除失败" + req.body.linkId});
         }
@@ -102,7 +145,7 @@ router.post('/deleteLink', function (req, res) {
 
 
 router.post('/getLinkById', function (req, res) {
-    Link.findOne({_id: mongoose.Types.ObjectId(req.body.linkId)},function(err,doc){
+    Link.findOne({_id: mongoose.Types.ObjectId(req.body.linkId)}, function (err, doc) {
         if (err) {
             res.json({"error": "获取Link失败" + req.body.linkId});
         }
@@ -114,7 +157,7 @@ router.post('/getLinkById', function (req, res) {
 
 
 router.post('/findLinkByUrlAndOwner', function (req, res) {
-    Link.find({url: req.body.url, owner : mongoose.Types.ObjectId(req.body.owner)},function(err,docs){
+    Link.find({url: req.body.url, owner: mongoose.Types.ObjectId(req.body.owner)}, function (err, docs) {
         if (err) {
             res.json({"error": err});
         }
@@ -126,7 +169,7 @@ router.post('/findLinkByUrlAndOwner', function (req, res) {
 
 
 router.post('/updateContent', function (req, res) {
-    Link.findOneAndUpdate({_id: req.body.linkId},{$set : {content : req.body.content}},function(err,doc){
+    Link.findOneAndUpdate({_id: req.body.linkId}, {$set: {content: req.body.content}}, function (err, doc) {
         if (err) {
             res.json({"error": err});
         }
