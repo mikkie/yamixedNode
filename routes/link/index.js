@@ -50,9 +50,14 @@ router.post('/postNewLink', function (req, res) {
 router.post('/getLinksBySpace', function (req, res) {
     Link.find({spaceId: mongoose.Types.ObjectId(req.body.spaceId)}).sort({lastVisitTime: -1}).exec(function (err, result) {
         if (err) {
-            res.json({"error": "??????"});
+            res.json({"error": err});
         }
         else {
+            if(result && result.length > 0){
+                for(var i in result){
+                    delete result[i]._doc.content;
+                }
+            }
             res.json({"success": result});
         }
     });
@@ -77,6 +82,11 @@ router.post('/searchLinks', function (req, res) {
             res.json({"error": err});
         }
         else {
+            if(result && result.length > 0){
+                for(var i in result){
+                    delete result[i]._doc.content;
+                }
+            }
             res.json({"success": result});
         }
     });
@@ -112,6 +122,11 @@ router.post('/searchLinksFromAddressBar', function (req, res) {
                     res.json({"error": err});
                 }
                 else {
+                    if(result && result.length > 0){
+                        for(var i in result){
+                            delete result[i]._doc.content;
+                        }
+                    }
                     res.json({"success": result});
                 }
             });
@@ -126,6 +141,9 @@ router.post('/updateLinkVisitTime', function (req, res) {
             res.json({"error": "更新lastVisitTime失败"});
         }
         else {
+            if(doc){
+                delete doc._doc.content;
+            }
             res.json({"success": doc});
         }
     });
@@ -150,6 +168,9 @@ router.post('/getLinkById', function (req, res) {
             res.json({"error": "获取Link失败" + req.body.linkId});
         }
         else {
+            if(doc){
+                delete doc._doc.content;
+            }
             res.json({"success": doc});
         }
     });
@@ -162,6 +183,11 @@ router.post('/findLinkByUrlAndOwner', function (req, res) {
             res.json({"error": err});
         }
         else {
+            if(docs && docs.length > 0){
+                for(var i in docs){
+                    delete docs[i]._doc.content;
+                }
+            }
             res.json({"success": docs});
         }
     });
@@ -174,6 +200,9 @@ router.post('/updateContent', function (req, res) {
             res.json({"error": err});
         }
         else {
+            if(doc){
+                delete doc._doc.content;
+            }
             res.json({"success": doc});
         }
     });
