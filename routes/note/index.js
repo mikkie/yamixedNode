@@ -14,7 +14,7 @@ router.post('/new', function (req, res) {
             res.json({"error":err});
         }
         else{
-            createLink(req.body.url,req.body.space,req.body.owner,req.body.sentence,req.body.content,res,function(link){
+            createLink(req.body.id,docs,req.body.url,req.body.space,req.body.owner,req.body.sentence,req.body.content,req.body.tags,res,function(link){
                 var detail = {
                     content : req.body.content,
                     sentence : req.body.sentence,
@@ -23,7 +23,7 @@ router.post('/new', function (req, res) {
                     x : req.body.x,
                     y : req.body.y
                 };
-                if(docs.length > 0){
+                if(docs && docs.length > 0){
                     note = docs[0];
                 }
                 else{
@@ -66,13 +66,13 @@ router.post('/new', function (req, res) {
 });
 
 
-var createLink = function(url,space,owner,sentence,content,res,callback){
-    var link = new Link();
+var saveNoteLink = function(link,url,space,owner,sentence,content,tags,res,callback){
     link.url = url;
     link.title = sentence;
     link.description = content;
     link.valid = true;
     link.previewImg = '';
+    link.tags = tags;
     link.spaceId = mongoose.Types.ObjectId(space);
     link.owner = mongoose.Types.ObjectId(owner);
     link.save(function (err, result) {
@@ -83,6 +83,32 @@ var createLink = function(url,space,owner,sentence,content,res,callback){
             callback(result.toObject());
         }
     });
+};
+
+var createLink = function(id,docs,url,space,owner,sentence,content,tags,res,callback){
+    var link = new Link();
+    if(id){
+        if(docs && docs.length > 0){
+           var note = docs[0];
+           if(note.notes.length > 0){
+                for(var i = 0; i < note.notes.length; i++){
+                    if(note.notes[i].toObject()._id.toString() == id){
+                        var linkId = note.notes[i].link;
+                        Link.findOne({_id:mongoose.Types.ObjectId(linkId)},function(err,doc){
+                           if(!err && doc){
+                              saveNoteLink(doc,url,space,owner,sentence,content,tags,res,callback);
+                           }
+                           else{
+                              saveNoteLink(link,url,space,owner,sentence,content,tags,res,callback);
+                           }
+                        });
+                        return;
+                    }
+                }
+           }
+        }
+    }
+    saveNoteLink(link,url,space,owner,sentence,content,tags,res,callback);
 };
 
 router.post('/delete', function (req, res) {
