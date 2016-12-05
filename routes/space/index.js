@@ -279,7 +279,7 @@ var createLink = function(node,spaceId,owner){
   var link = new Link();
   link.url = node.url;
   link.title = node.title;
-  link.description = '';
+  link.description = node.title;
   link.previewImg = '';
   link.content = '';
   link.spaceId = mongoose.Types.ObjectId(spaceId);
@@ -287,6 +287,20 @@ var createLink = function(node,spaceId,owner){
   link.tags = createTags(node);
   link.save(function(err,doc){
   });
+};
+
+var syncSingleBookmark = function(bookmark,spaceId,owner){
+    var link = new Link();
+    link.url = bookmark.url;
+    link.title = bookmark.title;
+    link.description = bookmark.title;
+    link.previewImg = '';
+    link.content = '';
+    link.spaceId = mongoose.Types.ObjectId(spaceId);
+    link.owner = mongoose.Types.ObjectId(owner);
+    link.tags = [];
+    link.save(function(err,doc){
+    });
 };
 
 var syncBookMark = function(nodes,spaceId,owner){
@@ -311,5 +325,14 @@ router.post('/init', function (req, res) {
     syncBookMark(nodes,spaceId,owner);
     res.json({"success": nodes});
 });
+
+router.post('/syncBookmark', function (req, res) {
+    var bookmark = req.body.bookmark;
+    var spaceId = req.body.spaceId;
+    var owner = req.body.owner;
+    syncSingleBookmark(bookmark,spaceId,owner);
+    res.json({"success": bookmark});
+});
+
 
 module.exports = router;
