@@ -23,6 +23,7 @@ router.post('/autoLogin',function(req,res,next){
 				var userO = user.toObject();
 				var realToken = generateAutoLoginCookie(userO);
 				if(token === realToken){
+                    removePassword(userO);
 					res.json({"success" : userO});
 				}
 				else{
@@ -38,6 +39,10 @@ router.post('/autoLogin',function(req,res,next){
 		}
 	});
 });
+
+var removePassword = function(userO){
+	delete userO.password;
+};
 
 
 //check Login
@@ -55,6 +60,7 @@ router.post('/go',function(req, res,next){
 						if(!err){
 							var newUser = updateUser.toObject();
 							newUser.autoLoginToken = generateAutoLoginCookie(newUser);
+                            removePassword(newUser);
 							res.json({"success" : newUser});
 						}
 						else{
