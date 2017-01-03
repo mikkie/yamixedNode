@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       ObjectId = Schema.ObjectId;
-mongoose.connect('mongodb://localhost/yamixed');
+mongoose.connect('mongodb://sa:123456@localhost/yamixed');
 
 //define tables
 
