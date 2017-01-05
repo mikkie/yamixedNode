@@ -19,6 +19,5 @@
     "nodemailer": "^2.6.4",
     "q": "^1.4.1",
     "serve-favicon": "^2.3.0"
-//    "urlbox": "^1.2.1"
   }
 }
