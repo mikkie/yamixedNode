@@ -1,7 +1,7 @@
 var mongoose = require('mongoose'),
       Schema = mongoose.Schema,
       ObjectId = Schema.ObjectId;
-mongoose.connect('mongodb://sa:123456@localhost/yamixed');
+mongoose.connect('mongodb://xx:xx@localhost/yamixed');
 
 //define tables
 
@@ -42,6 +42,7 @@ var LinkSchema = new Schema({
     url : {type : String, index : true},
     title : {type : String, index : true},
     description : {type : String, index : true},
+    color : {type : String},
     previewImg : String,
     content : String,
     spaceId : ObjectId,

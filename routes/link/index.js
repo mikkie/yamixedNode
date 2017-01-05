@@ -4,8 +4,11 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('../common/mongodbUtil'),
+    common = require('../common/common'),
     Link = mongoose.model('Link'),
     User = mongoose.model('User');
+    //Urlbox = require('urlbox'),
+    //urlbox = Urlbox('54a74ca2-31a5-4801-88b1-d9e5baf50151', 'c52bf450-e94e-466d-938e-c050591b23df');
 
 router.post('/postNewLink', function (req, res) {
     var id = req.body._id;
@@ -33,6 +36,7 @@ router.post('/postNewLink', function (req, res) {
         link.title = req.body.title;
         link.description = req.body.description;
         link.previewImg = req.body.previewImg;
+        link.color = common.randomColor('');
         link.spaceId = mongoose.Types.ObjectId(req.body.spaceId);
         link.owner = mongoose.Types.ObjectId(req.body.owner);
         link.tags = req.body.tags;
@@ -207,6 +211,16 @@ router.post('/updateContent', function (req, res) {
         }
     });
 });
+
+/*router.get('/url2png', function (req, res) {
+    var options = {
+        url: req.query.url,
+        thumb_width: 136,
+        format: 'png'
+    };
+    var imgUrl = urlbox.buildUrl(options);
+    res.send(decodeURIComponent(imgUrl));
+});*/
 
 
 module.exports = router;
