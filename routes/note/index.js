@@ -4,6 +4,7 @@
 var express = require('express'),
     router = express.Router(),
     mongoose = require('../common/mongodbUtil'),
+    common = require('../common/common'),
     Note = mongoose.model('Note'),
     Link = mongoose.model('Link');
 
@@ -14,7 +15,7 @@ router.post('/new', function (req, res) {
             res.json({"error":err});
         }
         else{
-            createLink(req.body.id,docs,req.body.url,req.body.space,req.body.owner,req.body.sentence,req.body.content,req.body.tags,res,function(link){
+            createLink(req.body.id,docs,req.body.icon,req.body.url,req.body.space,req.body.owner,req.body.sentence,req.body.content,req.body.tags,res,function(link){
                 var detail = {
                     content : req.body.content,
                     sentence : req.body.sentence,
@@ -66,12 +67,13 @@ router.post('/new', function (req, res) {
 });
 
 
-var saveNoteLink = function(link,url,space,owner,sentence,content,tags,res,callback){
+var saveNoteLink = function(link,icon,url,space,owner,sentence,content,tags,res,callback){
     link.url = url;
     link.title = sentence;
     link.description = content;
     link.valid = true;
-    link.previewImg = '';
+    link.color = common.randomColor('');
+    link.previewImg = icon;
     link.tags = tags;
     link.spaceId = mongoose.Types.ObjectId(space);
     link.owner = mongoose.Types.ObjectId(owner);
@@ -85,7 +87,7 @@ var saveNoteLink = function(link,url,space,owner,sentence,content,tags,res,callb
     });
 };
 
-var createLink = function(id,docs,url,space,owner,sentence,content,tags,res,callback){
+var createLink = function(id,docs,icon,url,space,owner,sentence,content,tags,res,callback){
     var link = new Link();
     if(id){
         if(docs && docs.length > 0){
@@ -96,10 +98,10 @@ var createLink = function(id,docs,url,space,owner,sentence,content,tags,res,call
                         var linkId = note.notes[i].link;
                         Link.findOne({_id:mongoose.Types.ObjectId(linkId)},function(err,doc){
                            if(!err && doc){
-                              saveNoteLink(doc,url,space,owner,sentence,content,tags,res,callback);
+                              saveNoteLink(doc,icon,url,space,owner,sentence,content,tags,res,callback);
                            }
                            else{
-                              saveNoteLink(link,url,space,owner,sentence,content,tags,res,callback);
+                              saveNoteLink(link,icon,url,space,owner,sentence,content,tags,res,callback);
                            }
                         });
                         return;
@@ -108,7 +110,7 @@ var createLink = function(id,docs,url,space,owner,sentence,content,tags,res,call
            }
         }
     }
-    saveNoteLink(link,url,space,owner,sentence,content,tags,res,callback);
+    saveNoteLink(link,icon,url,space,owner,sentence,content,tags,res,callback);
 };
 
 router.post('/delete', function (req, res) {
